@@ -62,22 +62,37 @@ async function run() {
   core.info(`[js-dependency-update]: target branch is ${targetBranch}`);
   core.info(`[js-dependency-update]: working directory is ${workingDir}`);
 
+  // npm 캐시를 지웁니다
+  await exec.exec("npm cache clean --force", [], {
+    cwd: workingDir,
+  });
+
+  // node_modules를 삭제합니다
+  await exec.exec("rm -rf node_modules", [], {
+    cwd: workingDir,
+  });
+
+  // npm install을 다시 실행합니다
+  await exec.exec("npm install", [], {
+    cwd: workingDir,
+  });
+
   await exec.exec("npm update", [], {
     cwd: workingDir,
   });
 
-  const gitStatus = await exec.getExecOutput(
-    "git status -s package*.json",
-    [],
-    {
-      cwd: workingDir,
-    }
-  );
-  if (gitStatus.stdout.length > 0) {
-    core.info("[js-dependency-update]: There are updates available!");
-  } else {
-    core.info("[js-dependency-update]: No updates at this point in time.");
-  }
+  // const gitStatus = await exec.getExecOutput(
+  //   "git status -s package*.json",
+  //   [],
+  //   {
+  //     cwd: workingDir,
+  //   }
+  // );
+  // if (gitStatus.stdout.length > 0) {
+  //   core.info("[js-dependency-update]: There are updates available!");
+  // } else {
+  //   core.info("[js-dependency-update]: No updates at this point in time.");
+  // }
 }
 
 run();
